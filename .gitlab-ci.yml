@@ -11,6 +11,21 @@ cs:
     script:
         - npm install
         - npm run cs
+
+changelog:
+    image: registry.docker/unit/node:6.9.1
+    tags:
+        - swarm
+    stage: test
+    before_script:
+        - yum remove -y git
+        - yum install -y epel-release
+        - yum install -y https://centos6.iuscommunity.org/ius-release.rpm
+        - yum install -y git2u-core
+    script:
+        - npm install
+        - npm run changelog-lint
+
 jenkins:
     image: registry.docker/unit/node:6.9.1
     tags:
