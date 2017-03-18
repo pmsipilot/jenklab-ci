@@ -120,11 +120,11 @@ caporal
     .description(metadata.description)
     .command('build', 'Build a job on Jenkins')
         .argument('<job>', 'Job name')
-        .option('--https')
-        .option('--host <host>')
-        .option('--port <port>')
-        .option('--username <username>')
-        .option('--token <token>')
+        .option('--https', 'Use https', caporal.BOOL, !!/^1|on?|y(?:es)?|t(?:rue)?$/.exec(process.env.JENKLAB_HTTPS))
+        .option('--host <host>', 'Jenkins host name', '', process.env.JENKLAB_HOST)
+        .option('--port <port>', 'Jenkins port number', caporal.INT, parseInt(process.env.JENKLAB_PORT, 10))
+        .option('--username <username>', 'Jenkins username', '', process.env.JENKLAB_USERNAME)
+        .option('--token <token>', 'Jenkins token', '', process.env.JENKLAB_TOKEN)
         .action((args, options, logger) => {
             const authentication = `${options.username}:${options.token}`;
             const url = `${options.host}${options.port ? `:${options.port}` : ''}`;
