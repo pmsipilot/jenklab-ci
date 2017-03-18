@@ -1,0 +1,23 @@
+{
+  "name": "pmsipilot-jenklab-ci",
+  "version": "1.0.0",
+  "description": "A command-line bridge between Gitlab CI and Jenkins CI",
+  "author": "Julien Bianchi <julien.bianchi@pmsipilot.com>",
+  "license": "MIT",
+  "main": "src/index.js",
+  "scripts": {
+    "cs": "eslint src/ specs/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@srv-gitlab.abc-objectif.local:julien.bianchi/jenkins.git"
+  },
+  "dependencies": {
+    "caporal": "^0.3.0",
+    "jenkins": "^0.20.0"
+  },
+  "devDependencies": {
+    "eslint": "^2.0.0",
+    "eslint-config-airbnb-base": "^3.0.1"
+  }
+}

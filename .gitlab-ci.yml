@@ -1,0 +1,22 @@
+stages:
+  - test
+cache:
+    paths:
+        - node_modules/
+cs:
+    image: registry.docker/unit/node:6.9.1
+    tags:
+        - swarm
+    stage: test
+    script:
+        - npm install
+        - npm run cs
+jenkins:
+    image: registry.docker/unit/node:6.9.1
+    tags:
+        - swarm
+    stage: test
+    when: manual
+    script:
+        - npm install
+        - node src/index.js build --host srv-hudson --port 8080 --username julien.bianchi --token 3e28cf178353623ef57ba5d280dab9ef test-jubianchi
