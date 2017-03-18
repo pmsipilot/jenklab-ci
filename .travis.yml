@@ -34,4 +34,5 @@ deploy:
     provider: script
     script: ci/deploy.sh
     on:
+        branch: master
         tags: true
