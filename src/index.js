@@ -1,5 +1,6 @@
 const caporal = require('caporal');
 const jenkins = require('jenkins');
+const utils = require('jenkins/lib/utils');
 const metadata = require('../package.json');
 
 function displayBuildStatus(client, job, build) {
@@ -46,7 +47,7 @@ function waitForBuildToStart(client, job, queue, logger) {
 
 function triggerBuild(client, job, parameters) {
     return new Promise((resolve, reject) => {
-        client.job.build(job, parameters || {}, (err, queue) => {
+        client.job.build(job, parameters || {}, (err, queue) => {
             if (err) {
                 reject(err);
             } else {
@@ -63,7 +64,7 @@ function buildJobRequest(job) {
         /^GITLAB.*$/,
         'GET_SOURCES_ATTEMPTS',
         'ARTIFACT_DOWNLOAD_ATTEMPTS',
-        'RESTORE_CACHE_ATTEMPTS'
+        'RESTORE_CACHE_ATTEMPTS',
     ];
 
     return new Promise((resolve) => {
@@ -72,19 +73,44 @@ function buildJobRequest(job) {
         resolve({
             job,
             parameters: Object.keys(env).reduce((previous, key) => {
-                for (const index in whitelist) {
-                    const allowed = whitelist[index];
-
+                whitelist.forEach((allowed) => {
                     if ((allowed.exec && allowed.exec(key)) || allowed === key) {
+                        /* eslint-disable no-param-reassign */
                         previous[key] = env[key];
-
-                        break;
+                        /* eslint-enable no-param-reassign */
                     }
-                }
+                });
 
                 return previous;
-            }, {})
+            }, {}),
         });
+    });
+}
+
+function setBuildDescription(client, job, build) {
+    return new Promise((resolve) => {
+        /* eslint-disable new-cap */
+        const folder = utils.FolderPath(job);
+        /* eslint-enable new-cap */
+
+        const req = {
+            path: '{folder}/{number}/submitDescription',
+            params: {
+                folder: folder.path(),
+                number: build,
+            },
+            query: {
+                description: `
+                    Triggered from <a href="${process.env.CI_PROJECT_URL}">${process.env.CI_PROJECT_PATH}</a> in 
+                    pipeline #${process.env.CI_PIPELINE_ID} by <a href="mailto:${process.env.GITLAB_USER_EMAIL}">
+                    ${process.env.GITLAB_USER_EMAIL}</a>
+                `,
+            },
+        };
+
+        /* eslint-disable no-underscore-dangle */
+        client.build.jenkins._post(req, () => { resolve({ job, id: build }); });
+        /* eslint-enable no-underscore-dangle */
     });
 }
 
@@ -110,11 +136,13 @@ caporal
             buildJobRequest(args.job)
                 .then(request => {
                     logger.debug('Sending request:', request);
+                    logger.debug('\n');
 
                     return request;
                 })
                 .then(result => triggerBuild(client, result.job, result.parameters))
                 .then(result => waitForBuildToStart(client, result.job, result.id, logger))
+                .then(result => setBuildDescription(client, result.job, result.id))
                 .then(result => streamBuildLog(client, result.job, result.id))
                 .then(result => displayBuildStatus(client, result.job, result.id))
                 .then((result) => { process.exit(result.status); })
