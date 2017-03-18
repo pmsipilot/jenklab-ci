@@ -35,4 +35,3 @@ deploy:
     script: ci/deploy.sh
     on:
         tags: true
-        branch: master
