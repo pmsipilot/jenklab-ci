@@ -36,20 +36,54 @@ function waitForBuildToStart(client, job, queue, logger) {
 
                 setTimeout(() => { waitForBuildToStart(client, job, queue, logger).then(resolve, reject); }, 5000);
             } else {
+                logger.info(`Starting ${job}#${data.executable.number}`);
+
                 resolve({ job, id: data.executable.number });
             }
         });
     });
 }
 
-function triggerBuild(client, job) {
+function triggerBuild(client, job, parameters) {
     return new Promise((resolve, reject) => {
-        client.job.build(job, (err, queue) => {
+        client.job.build(job, parameters || {}, (err, queue) => {
             if (err) {
                 reject(err);
             } else {
                 resolve({ job, id: queue });
             }
+        });
+    });
+}
+
+function buildJobRequest(job) {
+    const whitelist = [
+        /^CI$/,
+        /^CI_.*$/,
+        /^GITLAB.*$/,
+        'GET_SOURCES_ATTEMPTS',
+        'ARTIFACT_DOWNLOAD_ATTEMPTS',
+        'RESTORE_CACHE_ATTEMPTS'
+    ];
+
+    return new Promise((resolve) => {
+        const env = process.env;
+
+        resolve({
+            job,
+            parameters: Object.keys(env).reduce((previous, key) => {
+                for (const index in whitelist) {
+                    const allowed = whitelist[index];
+
+                    if ((allowed.exec && allowed.exec(key)) || allowed === key) {
+                        previous[key] = env[key];
+
+                        break;
+                    }
+                }
+
+                return previous;
+            }, {})
         });
     });
 }
@@ -73,7 +107,13 @@ caporal
                 crumbIssuer: true,
             });
 
-            triggerBuild(client, args.job)
+            buildJobRequest(args.job)
+                .then(request => {
+                    logger.debug('Sending request:', request);
+
+                    return request;
+                })
+                .then(result => triggerBuild(client, result.job, result.parameters))
                 .then(result => waitForBuildToStart(client, result.job, result.id, logger))
                 .then(result => streamBuildLog(client, result.job, result.id))
                 .then(result => displayBuildStatus(client, result.job, result.id))
