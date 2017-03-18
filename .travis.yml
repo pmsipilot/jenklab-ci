@@ -1,11 +1,33 @@
 language: node_js
 
-sudo: false
+sudo: required
+
+services:
+    - docker
 
 node_js:
-  - "4"
-  - "5"
-  - "6"
-  - "7"
+    - "4"
+    - "5"
+    - "6"
+    - "7"
 
+env:
+    global:
+        # DOCKER_EMAIL
+        -  secure: "HZ+RyjlLiphg1tL8d1jRQQniEkURgmnajPop1kJu62HaSy8DX7rL/LqrVXz9FAFhuXbH1zQ5OQAANDytL2ajKUfl0bTbWkE4jhB3KiiNo2JHFexSjTuLrPMAN0h5na2B/8bnoF0V0pXOMcFRDkk0u7v3/csjUOnzrjmz3fsO1kwM/XvjQxVjJNR8BAnzQDUbc01gbmemYbT+72fE3aJEh37wES7qml4Wz9wBvK6558tAirrY0NPfyfm1tL31/dSX7C2S6HZ6C437Z8L0giKWKcYnpuytwXj3SF4iSs7/mC3j1/GOIoIPyiBGcS85yigDC18B6QdfYGsNOXbjJCi0GwjvG9DnKBGcv3VsDJPOwqpQHg/QwKMAN1tiC8K+1UzGQMUyLPYxmw4HgqjQTvg/lGcFl0pGCruNaEd653JujHyrJEDOKomdS0BfSv/QAs8f1Cy/rFKI30/i+C6yet86VYjZa2olsgs2c4OyolfdgkhS6ZfwMKXSBqJQnwf6yCQ1VUlVqUAUJwtbZ9DMdq7MLDk0/CUxhuUndxKxN4/XvJ3anSr+HX5HfcdKozGOvn7Gh5lWKEnz0fxJ+I5gpuhyQuv4jly5ZDKua3i/ne8JysbC8sWbSB3hZM6j9F5uIJMG/yO6jeHER421VceYJwEfphUAZhgIlg6IBZGk3zOgKZs="
+        # DOCKER_USER
+        - secure: "aGEHloFRoZSG27pzu5L5EeqBVautQGC+NSoFE5SYhx0n0y7OyRN9iqCCHyb3YsLjwDVx//ft6x70I+/Ob1qVE2LjG/uyAiDJa8KGWL3CpAQJp8ZeuKCpTBBSu5IOEECOMYNhIr/xihiZjwE0theCQ5Vm0KhMtLluGlInz293x2KLItzsCU4zzAg656G3LIQfUYHWym5Zcd5wCa6PUmEuojLl3hu6o88cWKx4pkigsFCQiehi+/8eGxwi0oU7RP9G1E5HqnIfZsowbjnRwDM7SvSh+Wyu1jK4H8SK7FVYerb6BCPWgSYY0ng9v5J4CoiFI/9K/SkEveAVTcQzGlVIwEJWBjZtK7sgyxsFSmvAHRgzJXyA19NMO02j+sbZLY8q1EyAj5WJaoEZpa6JghthqGRToutM2Oe2F9DgVGqVdgIsWniH3s7NvRPBDyNb2+rxjF1ux6Mpiy69jE5jo/eXBkvaZHKu2vjwUpTKSiEmF158psaBb4mOUwEBRxEwbXD6++O2HKONV9A1Ik8padf6O5wKo4wnyA6NhAQwMbEqSMQPF4eN0uE/b/YZoCvmR4YrPPmzPIXsQlRZxYvN7qm3zHL443+MFSEX/4xHhv5mn9uDpMhPHn6RgKkjI9ensZjpkJ89FWp/f4mnwb9tnj7KSOVdri6zQUT/rurUj0YMdPM="
+        # DOCKER_PASS
+        - secure: "ef/mPSe3aNCogBEd1/2Cnn7HK7Lz/sHXnVXwgWKwJcZC32r5c/79OH7HFY1RAZpAq/Iw0mdmiFrQ2yzlQiaV8Y9/tJnnEge0ueodtS38quiOb1USD88Qk8O7wuiiblnUTRTqWvn2H0yWqC+EpztvL23VxBLNSByNouiPa48B6u9j6hZfxhSMdw7HzdoxY2AIW04FKtMMOFZ0wCapsxtTG6N0EPDIW7tIs8VnsllRwbbe5DEvtLgEQx7C1XU1SSUCZa9x6vZHRUL6kvc6PRYdr7pVcHvHJIUT5kMdnQ7GsYvUH6sz/x4zX7nGOAqGgzIBtjShWBwbbu4sYnqupRFQTraAScGeDG1j1YUY/Vo2tQQ/ryZ2axR3ZC3HCmEvzVJ3mPBF3byUMLTTv1fqOHlpDBy83WXTSMw0eLoc/GWcHmvOjYpau0JrDLBJFeh6vB8G75AeswOiNbPOFKyvPiLowvFZ93uii9LDlxeb2Ls2OITJ0LgsSwogqyOBs3UEF3bpaJjwnuI4lH4VM+1hMW7FErLZiC0fggrDUat+FU/M4OaQgeN4QHm3mMGISq69oV+QP9OujTecQ/utCyjzIy4x7d+dJ7KBw4Gvg9AacHUJJtgYB8NldgrLW993c0nv/f1bbgc6a4zBl5kIPk+XhJ3jGwWNye3H9J/kRiChwORQCvk="
+        - COMMIT=${TRAVIS_COMMIT::8}
 
+cache:
+    directories:
+        - node_modules
+
+deploy:
+    provider: script
+    script: ci/deploy.sh
+    on:
+        tags: true
+        branch: master
