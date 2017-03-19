@@ -140,7 +140,7 @@ caporal
 
                     return request;
                 })
-                .then(result => triggerBuild(client, result.job, result.parameters))
+                .then(result => triggerBuild(client, result.job, { parameters: result.parameters }))
                 .then(result => waitForBuildToStart(client, result.job, result.id, logger))
                 .then(result => setBuildDescription(client, result.job, result.id))
                 .then(result => streamBuildLog(client, result.job, result.id))

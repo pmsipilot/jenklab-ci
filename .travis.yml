@@ -31,8 +31,11 @@ script:
     - if [ -z "$TRAVIS_TAG" ]; then npm run changelog-lint; fi
 
 deploy:
-    provider: script
-    script: ci/deploy.sh
-    on:
-        branch: master
-        tags: true
+    - provider: script
+      script: ci/deploy.sh
+      on:
+          all_branches: master
+    - provider: script
+      script: ci/deploy.sh
+      on:
+          tags: true
