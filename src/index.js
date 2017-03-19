@@ -2,31 +2,57 @@ const caporal = require('caporal');
 const jenkins = require('jenkins');
 const utils = require('jenkins/lib/utils');
 const metadata = require('../package.json');
+const Build = require('./build');
+const BuildStatus = require('./build-status');
+const Queue = require('./queue');
+const Request = require('./request');
 
+/**
+ * @param {Jenkins} client
+ * @param {string} job
+ * @param {number} build
+ *
+ * @returns {Promise.<BuildStatus>}
+ */
 function displayBuildStatus(client, job, build) {
     return new Promise((resolve, reject) => {
         client.build.get(job, build, (err, data) => {
             if (err) {
                 reject(err);
             } else if (data.result !== 'SUCCESS') {
-                resolve({ job, id: build, status: 1 });
+                resolve(new BuildStatus(job, build, 1));
             } else {
-                resolve({ job, id: build, status: 0 });
+                resolve(new BuildStatus(job, build, 0));
             }
         });
     });
 }
 
+/**
+ * @param {Jenkins} client
+ * @param {string} job
+ * @param {number} build
+ *
+ * @returns {Promise.<Build>}
+ */
 function streamBuildLog(client, job, build) {
     return new Promise((resolve, reject) => {
         const log = client.build.logStream(job, build);
 
         log.on('data', process.stdout.write.bind(process.stdout));
         log.on('error', (error) => { reject(error); });
-        log.on('end', () => { resolve({ job, id: build }); });
+        log.on('end', () => { resolve(new Build(job, build)); });
     });
 }
 
+/**
+ * @param {Jenkins} client
+ * @param {string} job
+ * @param {number} queue
+ * @param {object} logger
+ *
+ * @returns {Promise.<Build>}
+ */
 function waitForBuildToStart(client, job, queue, logger) {
     return new Promise((resolve, reject) => {
         client.queue.item(queue, (err, data) => {
@@ -39,24 +65,36 @@ function waitForBuildToStart(client, job, queue, logger) {
             } else {
                 logger.info(`Starting ${job}#${data.executable.number}`);
 
-                resolve({ job, id: data.executable.number });
+                resolve(new Build(job, data.executable.number));
             }
         });
     });
 }
 
+/**
+ * @param {Jenkins} client
+ * @param {string} job
+ * @param {object} parameters
+ *
+ * @returns {Promise.<Queue>}
+ */
 function triggerBuild(client, job, parameters) {
     return new Promise((resolve, reject) => {
         client.job.build(job, parameters || {}, (err, queue) => {
             if (err) {
                 reject(err);
             } else {
-                resolve({ job, id: queue });
+                resolve(new Queue(job, queue));
             }
         });
     });
 }
 
+/**
+ * @param {string} job
+ *
+ * @returns {Promise.<Request>}
+ */
 function buildJobRequest(job) {
     const whitelist = [
         /^CI$/,
@@ -68,35 +106,37 @@ function buildJobRequest(job) {
     ];
 
     return new Promise((resolve) => {
-        const env = process.env;
+        const parameters = Object.keys(process.env).reduce((previous, key) => {
+            whitelist.forEach((allowed) => {
+                if ((allowed.exec && allowed.exec(key)) || allowed === key) {
+                    /* eslint-disable no-param-reassign */
+                    previous[key] = process.env[key];
+                    /* eslint-enable no-param-reassign */
+                }
+            });
 
-        resolve({
-            job,
-            parameters: Object.keys(env).reduce((previous, key) => {
-                whitelist.forEach((allowed) => {
-                    if ((allowed.exec && allowed.exec(key)) || allowed === key) {
-                        /* eslint-disable no-param-reassign */
-                        previous[key] = env[key];
-                        /* eslint-enable no-param-reassign */
-                    }
-                });
+            return previous;
+        }, {});
 
-                return previous;
-            }, {}),
-        });
+        resolve(new Request(job, parameters));
     });
 }
 
+/**
+ * @param {Jenkins} client
+ * @param {string} job
+ * @param {number} build
+ *
+ * @returns {Promise.<Build>}
+ */
 function setBuildDescription(client, job, build) {
     return new Promise((resolve) => {
-        /* eslint-disable new-cap */
-        const folder = utils.FolderPath(job);
-        /* eslint-enable new-cap */
-
         const req = {
             path: '{folder}/{number}/submitDescription',
             params: {
-                folder: folder.path(),
+                /* eslint-disable new-cap */
+                folder: utils.FolderPath(job).path(),
+                /* eslint-enable new-cap */
                 number: build,
             },
             query: {
@@ -109,9 +149,13 @@ function setBuildDescription(client, job, build) {
         };
 
         /* eslint-disable no-underscore-dangle */
-        client.build.jenkins._post(req, () => { resolve({ job, id: build }); });
+        client.build.jenkins._post(req, () => { resolve(new Build(job, build)); });
         /* eslint-enable no-underscore-dangle */
     });
+}
+
+function parseBool(value) {
+    return !!/^1|on?|y(?:es)?|t(?:rue)?$/.exec(value);
 }
 
 caporal
@@ -120,7 +164,7 @@ caporal
     .description(metadata.description)
     .command('build', 'Build a job on Jenkins')
         .argument('<job>', 'Job name')
-        .option('--https', 'Use https', caporal.BOOL, !!/^1|on?|y(?:es)?|t(?:rue)?$/.exec(process.env.JENKLAB_HTTPS))
+        .option('--https', 'Use https to reach Jenkins', caporal.BOOL, parseBool(process.env.JENKLAB_HTTPS))
         .option('--host <host>', 'Jenkins host name', '', process.env.JENKLAB_HOST)
         .option('--port <port>', 'Jenkins port number', caporal.INT, parseInt(process.env.JENKLAB_PORT, 10))
         .option('--username <username>', 'Jenkins username', '', process.env.JENKLAB_USERNAME)
@@ -140,12 +184,12 @@ caporal
 
                     return request;
                 })
-                .then(result => triggerBuild(client, result.job, { parameters: result.parameters }))
-                .then(result => waitForBuildToStart(client, result.job, result.id, logger))
-                .then(result => setBuildDescription(client, result.job, result.id))
-                .then(result => streamBuildLog(client, result.job, result.id))
-                .then(result => displayBuildStatus(client, result.job, result.id))
-                .then((result) => { process.exit(result.status); })
+                .then(request => triggerBuild(client, request.job, { parameters: request.parameters }))
+                .then(queue => waitForBuildToStart(client, queue.job, queue.queue, logger))
+                .then(build => setBuildDescription(client, build.job, build.build))
+                .then(build => streamBuildLog(client, build.job, build.build))
+                .then(build => displayBuildStatus(client, build.job, build.build))
+                .then((status) => { process.exit(status.status); })
                 .catch((error) => {
                     logger.error(error);
                     logger.error('\n');
