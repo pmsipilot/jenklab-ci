@@ -10,7 +10,7 @@
     "cs": "eslint src/ specs/",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1",
     "changelog-lint": "conventional-changelog-lint -p angular --from master --to HEAD",
-    "test": "npm run cs && npm run changelog-lint"
+    "specs": "mocha --check-leaks --recursive specs"
   },
   "repository": {
     "type": "git",
@@ -25,6 +25,8 @@
     "conventional-changelog-lint": "^1.1.0",
     "eslint": "^2.0.0",
     "eslint-config-airbnb-base": "^3.0.1",
-    "eslint-plugin-import": "^1.7.0"
+    "eslint-plugin-import": "^1.7.0",
+    "expect.js": "^0.3.1",
+    "mocha": "^3.2.0"
   }
 }

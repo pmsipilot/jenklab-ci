@@ -28,7 +28,8 @@ cache:
 script:
     - npm install
     - npm run cs
-    - if [ -z "$TRAVIS_TAG" ]; then npm run changelog-lint; fi
+    - if [[ -z "$TRAVIS_TAG" && "$TRAVIS_BRANCH" == "master" ]]; then npm run changelog-lint; fi
+    - npm run specs
 
 deploy:
     - provider: script
