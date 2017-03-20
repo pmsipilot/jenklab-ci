@@ -60,7 +60,7 @@ function waitForBuildToStart(client, job, queue, logger, interval) {
             if (err) {
                 reject(err);
             } else if (!data.executable) {
-                logger.info(`Build is waiting in queue: ${data.why}`);
+                logger.debug(`Build is waiting in queue: ${data.why}`);
 
                 setTimeout(
                     () => {
@@ -192,7 +192,11 @@ caporal
                     return request;
                 })
                 .then(request => triggerBuild(client, request.job, { parameters: request.parameters }))
-                .then(queue => waitForBuildToStart(client, queue.job, queue.queue, logger, options.pollingInterval))
+                .then(queue => {
+                    logger.log('Build was queued.');
+
+                    return waitForBuildToStart(client, queue.job, queue.queue, logger, options.pollingInterval);
+                })
                 .then(build => setBuildDescription(client, build.job, build.build))
                 .then(build => streamBuildLog(client, build.job, build.build))
                 .then(build => displayBuildStatus(client, build.job, build.build))
