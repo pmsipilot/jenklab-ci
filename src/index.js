@@ -1,3 +1,5 @@
+'use strict';
+
 const caporal = require('caporal');
 const jenkins = require('jenkins');
 const utils = require('jenkins/lib/utils');
@@ -5,6 +7,7 @@ const metadata = require('../package.json');
 const Build = require('./build');
 const BuildStatus = require('./build-status');
 const Environment = require('./environment');
+const Parameter = require('./parameter');
 const Queue = require('./queue');
 const Request = require('./request');
 const Url = require('./url');
@@ -100,11 +103,22 @@ function triggerBuild(client, job, parameters) {
 
 /**
  * @param {string} job
+ * @param {Array.<Parameter>} parameters
  *
  * @returns {Promise.<Request>}
  */
-function buildJobRequest(job) {
-    return new Promise((resolve) => { resolve(new Request(job, new Environment(process.env))); });
+function buildJobRequest(job, parameters) {
+    return new Promise((resolve) => {
+        resolve(
+            new Request(
+                job,
+                parameters.reduce(
+                    (previous, parameter) => Object.assign({}, previous, { [parameter.name]: parameter.value }),
+                    new Environment(process.env)
+                )
+            )
+        );
+    });
 }
 
 /**
@@ -151,17 +165,23 @@ caporal
         .argument('<job>', 'Job name')
         .option('--https', 'Use https to reach Jenkins', caporal.BOOL, parseBool(process.env.JENKLAB_HTTPS))
         .option('--host <host>', 'Jenkins host name', '', process.env.JENKLAB_HOST)
-        .option('--port <port>', 'Jenkins port number', caporal.INT, parseInt(process.env.JENKLAB_PORT, 10))
+        .option(
+            '--port <port>',
+            'Jenkins port number',
+            caporal.INT,
+            process.env.JENKLAB_PORT ? parseInt(process.env.JENKLAB_PORT, 10) : null
+        )
         .option('--username <username>', 'Jenkins username', '', process.env.JENKLAB_USERNAME)
         .option('--token <token>', 'Jenkins token', '', process.env.JENKLAB_TOKEN)
         .option('--polling-interval <token>', 'Polling interval (seconds)', caporal.INT, 5)
+        .option('--parameter <descriptor>', 'Additional parameters', caporal.REPEATABLE)
         .action((args, options, logger) => {
             const client = jenkins({
                 baseUrl: new Url(options).toString(),
                 crumbIssuer: true,
             });
 
-            buildJobRequest(args.job)
+            buildJobRequest(args.job, options.parameter.map(descriptor => new Parameter(descriptor)))
                 .then(request => {
                     logger.debug('Sending request:', request);
                     logger.debug('\n');
