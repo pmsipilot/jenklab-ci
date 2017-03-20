@@ -6,6 +6,7 @@ const Build = require('./build');
 const BuildStatus = require('./build-status');
 const Queue = require('./queue');
 const Request = require('./request');
+const Url = require('./url');
 
 /**
  * @param {Jenkins} client
@@ -177,10 +178,8 @@ caporal
         .option('--token <token>', 'Jenkins token', '', process.env.JENKLAB_TOKEN)
         .option('--polling-interval <token>', 'Polling interval (seconds)', caporal.INT, 5)
         .action((args, options, logger) => {
-            const authentication = `${options.username}:${options.token}`;
-            const url = `${options.host}${options.port ? `:${options.port}` : ''}`;
             const client = jenkins({
-                baseUrl: `http${options.https ? 's' : ''}://${authentication}@${url}`,
+                baseUrl: new Url(options).toString(),
                 crumbIssuer: true,
             });
 
