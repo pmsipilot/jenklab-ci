@@ -50,10 +50,11 @@ function streamBuildLog(client, job, build) {
  * @param {string} job
  * @param {number} queue
  * @param {object} logger
+ * @param {number} interval
  *
  * @returns {Promise.<Build>}
  */
-function waitForBuildToStart(client, job, queue, logger) {
+function waitForBuildToStart(client, job, queue, logger, interval) {
     return new Promise((resolve, reject) => {
         client.queue.item(queue, (err, data) => {
             if (err) {
@@ -61,7 +62,12 @@ function waitForBuildToStart(client, job, queue, logger) {
             } else if (!data.executable) {
                 logger.info(`Build is waiting in queue: ${data.why}`);
 
-                setTimeout(() => { waitForBuildToStart(client, job, queue, logger).then(resolve, reject); }, 5000);
+                setTimeout(
+                    () => {
+                        waitForBuildToStart(client, job, queue, logger).then(resolve, reject);
+                    },
+                    interval * 1000
+                );
             } else {
                 logger.info(`Starting ${job}#${data.executable.number}`);
 
@@ -169,6 +175,7 @@ caporal
         .option('--port <port>', 'Jenkins port number', caporal.INT, parseInt(process.env.JENKLAB_PORT, 10))
         .option('--username <username>', 'Jenkins username', '', process.env.JENKLAB_USERNAME)
         .option('--token <token>', 'Jenkins token', '', process.env.JENKLAB_TOKEN)
+        .option('--polling-interval <token>', 'Polling interval (seconds)', caporal.INT, 5)
         .action((args, options, logger) => {
             const authentication = `${options.username}:${options.token}`;
             const url = `${options.host}${options.port ? `:${options.port}` : ''}`;
@@ -185,7 +192,7 @@ caporal
                     return request;
                 })
                 .then(request => triggerBuild(client, request.job, { parameters: request.parameters }))
-                .then(queue => waitForBuildToStart(client, queue.job, queue.queue, logger))
+                .then(queue => waitForBuildToStart(client, queue.job, queue.queue, logger, options.pollingInterval))
                 .then(build => setBuildDescription(client, build.job, build.build))
                 .then(build => streamBuildLog(client, build.job, build.build))
                 .then(build => displayBuildStatus(client, build.job, build.build))
