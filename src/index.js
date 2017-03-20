@@ -64,7 +64,7 @@ function waitForBuildToStart(client, job, queue, logger, interval) {
 
                 setTimeout(
                     () => {
-                        waitForBuildToStart(client, job, queue, logger).then(resolve, reject);
+                        waitForBuildToStart(client, job, queue, logger, interval).then(resolve, reject);
                     },
                     interval * 1000
                 );
