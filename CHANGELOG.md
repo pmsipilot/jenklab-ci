@@ -1,3 +1,21 @@
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/pmsipilot/jenklab-ci/compare/1.0.0-beta.4...v1.0.0) (2017-03-21)
+
+
+### Bug Fixes
+
+* Authentication is optional ([fd66b83](https://github.com/pmsipilot/jenklab-ci/commit/fd66b83)), closes [#2](https://github.com/pmsipilot/jenklab-ci/issues/2)
+* Be less verbose when build is queued ([7a4aa14](https://github.com/pmsipilot/jenklab-ci/commit/7a4aa14))
+* Parameters are correctly sent ([926dd84](https://github.com/pmsipilot/jenklab-ci/commit/926dd84))
+* Polling interval is correctly used ([1528661](https://github.com/pmsipilot/jenklab-ci/commit/1528661))
+
+
+### Features
+
+* The polling interval is customisable ([208a7ee](https://github.com/pmsipilot/jenklab-ci/commit/208a7ee)), closes [#3](https://github.com/pmsipilot/jenklab-ci/issues/3)
+
+
+
 <a name="1.0.0-beta.4"></a>
 # [1.0.0-beta.4](https://github.com/pmsipilot/jenklab-ci/compare/1.0.0-beta.3...1.0.0-beta.4) (2017-03-18)
 
