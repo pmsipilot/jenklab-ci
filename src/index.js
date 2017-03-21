@@ -4,6 +4,7 @@ const utils = require('jenkins/lib/utils');
 const metadata = require('../package.json');
 const Build = require('./build');
 const BuildStatus = require('./build-status');
+const Environment = require('./environment');
 const Queue = require('./queue');
 const Request = require('./request');
 const Url = require('./url');
@@ -20,10 +21,10 @@ function displayBuildStatus(client, job, build) {
         client.build.get(job, build, (err, data) => {
             if (err) {
                 reject(err);
-            } else if (data.result !== 'SUCCESS') {
-                resolve(new BuildStatus(job, build, 1));
+            } else if (BuildStatus.isSuccessful(data.result)) {
+                resolve(new BuildStatus(job, build, BuildStatus.SUCCESS));
             } else {
-                resolve(new BuildStatus(job, build, 0));
+                resolve(new BuildStatus(job, build, BuildStatus.FAILURE));
             }
         });
     });
@@ -103,30 +104,7 @@ function triggerBuild(client, job, parameters) {
  * @returns {Promise.<Request>}
  */
 function buildJobRequest(job) {
-    const whitelist = [
-        /^CI$/,
-        /^CI_.*$/,
-        /^GITLAB.*$/,
-        'GET_SOURCES_ATTEMPTS',
-        'ARTIFACT_DOWNLOAD_ATTEMPTS',
-        'RESTORE_CACHE_ATTEMPTS',
-    ];
-
-    return new Promise((resolve) => {
-        const parameters = Object.keys(process.env).reduce((previous, key) => {
-            whitelist.forEach((allowed) => {
-                if ((allowed.exec && allowed.exec(key)) || allowed === key) {
-                    /* eslint-disable no-param-reassign */
-                    previous[key] = process.env[key];
-                    /* eslint-enable no-param-reassign */
-                }
-            });
-
-            return previous;
-        }, {});
-
-        resolve(new Request(job, parameters));
-    });
+    return new Promise((resolve) => { resolve(new Request(job, new Environment(process.env))); });
 }
 
 /**

@@ -14,6 +14,13 @@ class BuildStatus {
         Object.freeze(this);
         Object.seal(this);
     }
+
+    static isSuccessful(status) {
+        return status === 'SUCCESS';
+    }
 }
+
+BuildStatus.SUCCESS = 0;
+BuildStatus.FAILURE = 1;
 
 module.exports = BuildStatus;
