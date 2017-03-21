@@ -14,7 +14,7 @@ describe('Environment', () => {
     describe('Custom environment', () => {
         const variables = {
             FOO: 'bar',
-            BAZ: 'boo'
+            BAZ: 'boo',
         };
 
         beforeEach(() => { environment = new Environment(variables); });

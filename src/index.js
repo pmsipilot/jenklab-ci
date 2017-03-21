@@ -49,10 +49,10 @@ function streamBuildLog(client, job, build) {
 
 /**
  * @param {Jenkins} client
- * @param {string} job
- * @param {number} queue
- * @param {object} logger
- * @param {number} interval
+ * @param {string}  job
+ * @param {number}  queue
+ * @param {winston} logger
+ * @param {number}  interval
  *
  * @returns {Promise.<Build>}
  */
