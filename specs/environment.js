@@ -12,10 +12,15 @@ describe('Environment', () => {
     it('should be sealed', () => { expect(Object.isSealed(environment)).to.be(true); });
 
     describe('Custom environment', () => {
-        beforeEach(() => { environment = new Environment(process.env); });
+        const variables = {
+            FOO: 'bar',
+            BAZ: 'boo'
+        };
+
+        beforeEach(() => { environment = new Environment(variables); });
 
         it('should reject unknown environment variable', () => {
-            Object.keys(process.env).forEach(variable => {
+            Object.keys(variables).forEach(variable => {
                 expect(environment).to.not.have.property(variable);
             });
         });
