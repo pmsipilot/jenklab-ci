@@ -1,3 +1,13 @@
+<a name="1.1.0"></a>
+# [1.1.0](https://github.com/pmsipilot/jenklab-ci/compare/1.0.0...v1.1.0) (2017-04-25)
+
+
+### Features
+
+* Additional arguments are allowed ([989c460](https://github.com/pmsipilot/jenklab-ci/commit/989c460)), closes [#4](https://github.com/pmsipilot/jenklab-ci/issues/4)
+
+
+
 <a name="1.0.0"></a>
 # [1.0.0](https://github.com/pmsipilot/jenklab-ci/compare/1.0.0-beta.4...v1.0.0) (2017-03-21)
 
