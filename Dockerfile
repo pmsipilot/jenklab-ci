@@ -1,6 +1,7 @@
 FROM node:alpine
 
 ENV NODE_ENV=production
+STOPSIGNAL SIGTERM
 
 RUN mkdir -p /jenklab-ci/src && \
     mkdir -p /jenklab-ci/bin

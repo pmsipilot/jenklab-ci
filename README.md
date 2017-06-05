@@ -63,6 +63,8 @@ jenkins-job-name:
     when: manual
     script:
         - jenklab-ci build $CI_BUILD_NAME
+    after_script:
+        - jenklab-ci kill
 ```
 
 ## Caveats
