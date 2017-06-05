@@ -62,7 +62,7 @@ jenkins-job-name:
     stage: jenkins
     when: manual
     script:
-        - jenklab-ci build $CI_BUILD_NAME
+        - jenklab-ci build $CI_JOB_NAME
     after_script:
         - jenklab-ci kill
 ```
