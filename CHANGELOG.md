@@ -1,3 +1,19 @@
+<a name="1.2.0"></a>
+# [1.2.0](https://github.com/pmsipilot/jenklab-ci/compare/1.1.0...v1.2.0) (2017-06-05)
+
+
+### Bug Fixes
+
+* Rename variables to conform to Gitlab Runners 9.0+ ([11728b7](https://github.com/pmsipilot/jenklab-ci/commit/11728b7))
+* create empty array of options if undefined ([b7457c1](https://github.com/pmsipilot/jenklab-ci/commit/b7457c1))
+
+
+### Features
+
+* Handle build cancellation ([82e7dc3](https://github.com/pmsipilot/jenklab-ci/commit/82e7dc3))
+
+
+
 <a name="1.1.0"></a>
 # [1.1.0](https://github.com/pmsipilot/jenklab-ci/compare/1.0.0...v1.1.0) (2017-04-25)
 
