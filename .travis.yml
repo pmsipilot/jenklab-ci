@@ -10,6 +10,7 @@ node_js:
     - "5"
     - "6"
     - "7"
+    - "8"
 
 env:
     global:
@@ -35,8 +36,10 @@ deploy:
     - provider: script
       script: ci/deploy.sh
       on:
+          node: 8
           all_branches: master
     - provider: script
       script: ci/deploy.sh
       on:
+          node: 8
           tags: true
