@@ -1,5 +1,7 @@
 # Jenklab CI [![Build Status](https://travis-ci.org/pmsipilot/jenklab-ci.svg?branch=master)](https://travis-ci.org/pmsipilot/jenklab-ci)
 
+![Jenklab CI ](resources/jenklab-ci-horiz.png)
+
 A command-line bridge between Gitlab CI and Jenkins CI.
 
 ## Why?
