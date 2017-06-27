@@ -75,3 +75,9 @@ jenkins-job-name:
 Gitlab database.
 * Your Jenkins job might take longer due to the time spent in queue. By default, Gitlab CI jobs are killed after 60 
 minutes. You might need to change the job timeout in you Gitlab project's CI/CD configuration.
+
+## License
+
+This project is released under the [MIT license](LICENSE) except for the [logos](resources) which are released under 
+the [Creative Commons Attribution-ShareAlike 3.0 Unported License](https://creativecommons.org/licenses/by-sa/3.0/) as
+requested by the [Jenkins project's](https://jenkins.io/) license [terms](https://wiki.jenkins.io/display/JENKINS/Logo).
