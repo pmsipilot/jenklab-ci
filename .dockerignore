@@ -1,0 +1,4 @@
+ci/
+node_modules/
+resources/
+specs/
