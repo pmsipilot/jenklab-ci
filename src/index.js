@@ -143,7 +143,7 @@ function setBuildDescription(client, job, build) {
             },
             query: {
                 description: `
-                    Triggered from <a href="${process.env.CI_PROJECT_URL}">${process.env.CI_PROJECT_PATH}</a> in 
+                    Triggered from <a href="${process.env.CI_PROJECT_URL}">${process.env.CI_PROJECT_PATH}</a> in
                     pipeline #${process.env.CI_PIPELINE_ID} by <a href="mailto:${process.env.GITLAB_USER_EMAIL}">
                     ${process.env.GITLAB_USER_EMAIL}</a>
                 `,
@@ -253,6 +253,12 @@ caporal
                 baseUrl: new Url(options).toString(),
                 crumbIssuer: true,
             });
+
+            let parameters = options.parameter || [];
+
+            if (!Array.isArray(parameters)) {
+                parameters = [parameters];
+            }
 
             buildJobRequest(args.job, (options.parameter || []).map(descriptor => new Parameter(descriptor)))
                 .then(request => {
