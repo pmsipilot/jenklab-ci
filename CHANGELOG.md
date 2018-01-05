@@ -1,3 +1,18 @@
+<a name="1.3.0"></a>
+# [1.3.0](https://github.com/pmsipilot/jenklab-ci/compare/1.2.0...1.3.0) (2018-01-05)
+
+
+### Bug Fixes
+
+* Run build with a single parameter ([51ce4e6](https://github.com/pmsipilot/jenklab-ci/commit/51ce4e6))
+
+
+### Features
+
+* We now have a logo! ([4d7e23b](https://github.com/pmsipilot/jenklab-ci/commit/4d7e23b))
+
+
+
 <a name="1.2.0"></a>
 # [1.2.0](https://github.com/pmsipilot/jenklab-ci/compare/1.1.0...v1.2.0) (2017-06-05)
 
