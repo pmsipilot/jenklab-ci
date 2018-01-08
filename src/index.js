@@ -260,7 +260,7 @@ caporal
                 parameters = [parameters];
             }
 
-            buildJobRequest(args.job, (options.parameter || []).map(descriptor => new Parameter(descriptor)))
+            buildJobRequest(args.job, parameters.map(descriptor => new Parameter(descriptor)))
                 .then(request => {
                     logger.debug('Sending request:', request);
                     logger.debug('\n');
