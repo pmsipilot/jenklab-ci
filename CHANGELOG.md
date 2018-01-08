@@ -1,3 +1,13 @@
+<a name="1.3.1"></a>
+## [1.3.1](https://github.com/pmsipilot/jenklab-ci/compare/1.3.0...1.3.1) (2018-01-08)
+
+
+### Bug Fixes
+
+* Single parameter builds are correctly handled ([528d33f](https://github.com/pmsipilot/jenklab-ci/commit/528d33f))
+
+
+
 <a name="1.3.0"></a>
 # [1.3.0](https://github.com/pmsipilot/jenklab-ci/compare/1.2.0...1.3.0) (2018-01-05)
 
