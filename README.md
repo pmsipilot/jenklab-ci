@@ -21,33 +21,34 @@ You will be able to see the whole build log direclty from Gitlab CI.
 Jenklab CI is accessible through a command-line script:
 
 ```sh
- bin/jenklab-ci 
+pmsipilot-jenklab-ci 1.4.0 - A command-line bridge between Gitlab CI and Jenkins CI
+  
+USAGE
 
-   pmsipilot-jenklab-ci 1.0.0 - A command-line bridge between Gitlab CI and Jenkins CI
-     
-   USAGE
+  jenklab-ci build <job>
 
-     jenklab-ci build <job>
+ARGUMENTS
 
-   ARGUMENTS
+  <job>      Job name      required
 
-     <job>      Job name      required      
+OPTIONS
 
-   OPTIONS
+  --https                         Use https to reach Jenkins               optional      default: false
+  --host <host>                   Jenkins host name                        optional
+  --port <port>                   Jenkins port number                      optional
+  --username <username>           Jenkins username                         optional
+  --token <token>                 Jenkins token                            optional
+  --polling-interval <token>      Polling interval (seconds)               optional      default: 5    
+  --parameter <descriptor>        Additional parameters                    optional
+  --dot                           Use a dot report, do not stream log      optional      default: false
 
-     --https                    Use https                optional      default: false
-     --host <host>              Jenkins host name        optional                    
-     --port <port>              Jenkins port number      optional      default: null 
-     --username <username>      Jenkins username         optional                    
-     --token <token>            Jenkins token            optional                     
+GLOBAL OPTIONS
 
-   GLOBAL OPTIONS
-
-     -h, --help         Display help                                      
-     -V, --version      Display version                                   
-     --no-color         Disable colors                                    
-     --quiet            Quiet mode - only displays warn and error messages
-     -v, --verbose      Verbose mode - will also output debug messages
+  -h, --help         Display help
+  -V, --version      Display version
+  --no-color         Disable colors
+  --quiet            Quiet mode - only displays warn and error messages
+  -v, --verbose      Verbose mode - will also output debug messages
 ```
 
 A Docker image is also available to let you add it to your `.gitlab-ci.yml`:

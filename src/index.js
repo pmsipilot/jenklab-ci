@@ -40,14 +40,21 @@ function displayBuildStatus(client, job, build) {
  * @param {Jenkins} client
  * @param {string} job
  * @param {number} build
+ * @param {boolean} dot
  *
  * @returns {Promise.<Build>}
  */
-function streamBuildLog(client, job, build) {
+function streamBuildLog(client, job, build, dot) {
     return new Promise((resolve, reject) => {
         const log = client.build.logStream(job, build);
 
-        log.on('data', process.stdout.write.bind(process.stdout));
+        log.on('data', (data) => {
+            if (dot) {
+                process.stdout.write('.');
+            } else {
+                process.stdout.write(data.toString());
+            }
+        });
         log.on('error', (error) => { reject(error); });
         log.on('end', () => { resolve(new Build(job, build)); });
     });
@@ -248,6 +255,7 @@ caporal
         .option('--token <token>', 'Jenkins token', '', process.env.JENKLAB_TOKEN)
         .option('--polling-interval <token>', 'Polling interval (seconds)', caporal.INT, 5)
         .option('--parameter <descriptor>', 'Additional parameters', caporal.REPEATABLE)
+        .option('--dot', 'Use a dot report, do not stream log', caporal.BOOL, parseBool(process.env.JENKLAB_DOT))
         .action((args, options, logger) => {
             const client = jenkins({
                 baseUrl: new Url(options).toString(),
@@ -276,7 +284,7 @@ caporal
                 .then(build => setBuildCancelHandler(client, logger, build.job, build.build))
                 .then(build => writeBuildIdentifier(build.job, build.build))
                 .then(build => setBuildDescription(client, build.job, build.build))
-                .then(build => streamBuildLog(client, build.job, build.build))
+                .then(build => streamBuildLog(client, build.job, build.build, !!options.dot))
                 .then(build => removeBuildCancelHandler(build.job, build.build))
                 .then(build => displayBuildStatus(client, build.job, build.build))
                 .then((status) => { process.exit(status.status); })
