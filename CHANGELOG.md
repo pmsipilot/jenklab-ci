@@ -1,3 +1,13 @@
+<a name="1.4.0"></a>
+# [1.4.0](https://github.com/pmsipilot/jenklab-ci/compare/1.3.1...1.4.0) (2018-03-15)
+
+
+### Features
+
+* Add a dot option to avoid streaming huge logs ([3481d6d](https://github.com/pmsipilot/jenklab-ci/commit/3481d6d))
+
+
+
 <a name="1.3.1"></a>
 ## [1.3.1](https://github.com/pmsipilot/jenklab-ci/compare/1.3.0...1.3.1) (2018-01-08)
 
